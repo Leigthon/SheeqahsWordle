@@ -112,7 +112,7 @@
       <input type="text" id="guess3" maxlength="1" />
       <input type="text" id="guess4" maxlength="1" />
       <input type="text" id="guess5" maxlength="1" />
-       <input type="text"id="guess6" maxlength="1" />
+      <input type="text"id="guess6" maxlength="1" />
       <input type="text" id="guess7" maxlength="1" />
       <input type="text" id="guess8" maxlength="1" />
     </div>
@@ -134,9 +134,12 @@
           document.getElementById("guess3").value,
           document.getElementById("guess4").value,
           document.getElementById("guess5").value,
+          document.getElementById("guess6").value,
+          document.getElementById("guess7").value,
+          document.getElementById("guess8").value,
         ].join("");
 
-        if (guess.length !== 5) {
+        if (guess.length !== 8) {
           messageDiv.textContent = "Please enter exactly 5 letters.";
           return;
         }
@@ -144,7 +147,7 @@
         attempts++;
         let feedback = [];
 
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 8; i++) {
           if (guess[i] === solution[i]) {
             feedback.push("correct");
           } else if (solution.includes(guess[i])) {
