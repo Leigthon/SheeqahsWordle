@@ -3,64 +3,86 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wordle Game - iLuvU</title>
+  <title>September Wordle - Guess the Word!</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      background-color: #f4f4f4;
+      background-color: #f0f8ff; /* light blue for September sky feel */
       padding: 5vw;
+      color: #333;
     }
-    h1 { font-size: 2.5rem; margin-bottom: 20px; }
+    h1 { 
+      font-size: 2.8rem; 
+      margin-bottom: 15px; 
+      color: #d2691e; /* warm autumn orange */
+    }
+    .subtitle {
+      font-size: 1.4rem;
+      margin-bottom: 25px;
+      color: #555;
+    }
     .grid {
       display: grid;
       grid-template-columns: repeat(5, 60px);
-      gap: 5px;
+      gap: 6px;
       margin: 30px auto;
       justify-content: center;
+      max-width: 350px;
     }
     .cell {
       width: 60px;
       height: 60px;
-      background-color: #ddd;
+      background-color: #e0e0e0;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 2rem;
+      font-size: 2.2rem;
       font-weight: bold;
-      border-radius: 5px;
+      border-radius: 8px;
       text-transform: uppercase;
+      border: 2px solid #aaa;
     }
-    .correct  { background-color: #538d4e; color: white; }
-    .present  { background-color: #b59f3b; color: white; }
-    .absent   { background-color: #3a3c3c; color: white; }
+    .correct  { background-color: #6b8e23; color: white; border-color: #556b2f; } /* olive green for fall */
+    .present  { background-color: #cd853f; color: white; border-color: #8b4513; } /* saddle brown / golden */
+    .absent   { background-color: #808080; color: white; border-color: #696969; }
     .input-row {
-      margin: 20px 0;
+      margin: 25px 0;
     }
     .input-row input {
       width: 50px;
       height: 50px;
-      font-size: 1.8rem;
+      font-size: 1.9rem;
       text-align: center;
-      margin: 0 4px;
+      margin: 0 5px;
       text-transform: uppercase;
+      border: 2px solid #bbb;
+      border-radius: 6px;
     }
     .btn {
-      background-color: #4caf50;
+      background-color: #ff4500; /* orange-red for September energy */
       color: white;
-      padding: 12px 30px;
+      padding: 14px 40px;
       border: none;
-      border-radius: 4px;
-      font-size: 1.2rem;
+      border-radius: 6px;
+      font-size: 1.3rem;
       cursor: pointer;
-      margin-top: 10px;
+      margin-top: 15px;
+      transition: background 0.2s;
     }
-    #message { margin-top: 20px; font-size: 1.3rem; min-height: 1.4em; }
+    .btn:hover { background-color: #e03e00; }
+    #message { 
+      margin-top: 25px; 
+      font-size: 1.4rem; 
+      min-height: 1.5em; 
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
 
-  <h1>Wordle - Guess the word!</h1>
+  <h1>September Wordle</h1>
+  <p class="subtitle">Back-to-school vibes • Early fall • Guess the 5-letter word!</p>
 
   <div class="grid" id="grid"></div>
 
@@ -76,14 +98,16 @@
   <div id="message"></div>
 
   <script>
-    const solution   = "MARRY";           // ← 5 letters, uppercase
+    const solution   = "SCHOOL";          // ← September theme (back to school!)
+    // Alternatives: "APPLE", "ACORN", "CIDER", "EQUIN", "MAIZE", "FALLS"
+
     const grid       = document.getElementById("grid");
     const messageDiv = document.getElementById("message");
     let row = 0;
     let attempts = 0;
     const maxAttempts = 6;
 
-    // Create 6×5 empty grid at start
+    // Create empty 6×5 grid
     for (let i = 0; i < maxAttempts * 5; i++) {
       const cell = document.createElement("div");
       cell.classList.add("cell");
@@ -98,7 +122,7 @@
       document.getElementById("g5")
     ];
 
-    // Auto-focus next input + uppercase
+    // Auto-focus next + uppercase + backspace jump
     inputs.forEach((input, i) => {
       input.addEventListener("input", () => {
         input.value = input.value.toUpperCase();
@@ -115,23 +139,22 @@
       const guess = inputs.map(el => el.value).join("").trim();
 
       if (guess.length !== 5) {
-        messageDiv.textContent = "Please enter 5 letters.";
+        messageDiv.textContent = "Enter a 5-letter word!";
         return;
       }
 
       attempts++;
       messageDiv.textContent = "";
 
-      // Simple feedback (not perfect duplicate handling)
+      // Feedback logic (handles duplicates properly)
       let feedback = Array(5).fill("absent");
       let solutionCount = {};
 
-      // Count letters in solution
       for (let char of solution) {
         solutionCount[char] = (solutionCount[char] || 0) + 1;
       }
 
-      // First pass: correct positions
+      // Correct positions first
       for (let i = 0; i < 5; i++) {
         if (guess[i] === solution[i]) {
           feedback[i] = "correct";
@@ -139,7 +162,7 @@
         }
       }
 
-      // Second pass: present letters
+      // Present (yellow) letters
       for (let i = 0; i < 5; i++) {
         if (feedback[i] === "absent" && solution.includes(guess[i]) && solutionCount[guess[i]] > 0) {
           feedback[i] = "present";
@@ -147,7 +170,7 @@
         }
       }
 
-      // Update current row
+      // Update row
       const cells = grid.children;
       const start = row * 5;
       for (let i = 0; i < 5; i++) {
@@ -157,9 +180,9 @@
       }
 
       if (guess === solution) {
-        messageDiv.textContent = "Congratulations! I love you Asheeqah Adonis ❤️";
+        messageDiv.textContent = "You got it! Happy September vibes 🌾🍎";
         setTimeout(() => {
-          window.location.href = "https://youtu.be/4urQzMh5gZw?si=pRbwj_mvvWBKD87-";
+          window.location.href = "https://youtu.be/uJViyj5z6aY?si=7t35eXgaBpdUDFxO"; // example: upbeat September song/video
         }, 1800);
         return;
       }
@@ -169,7 +192,7 @@
         return;
       }
 
-      // Move to next row + clear inputs
+      // Next row + reset inputs
       row++;
       inputs.forEach(el => el.value = "");
       inputs[0].focus();
