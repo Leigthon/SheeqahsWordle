@@ -3,174 +3,188 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>September Wordle - Guess the Word!</title>
+  <title>Okay smarty pants Guess the Word!</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      background-color: #f0f8ff; /* light blue for September sky feel */
-      padding: 5vw;
+      background-color: #f0f8ff;
+      padding: 4vw;
       color: #333;
     }
     h1 {
-      font-size: 2.8rem;
+      font-size: clamp(2rem, 5vw, 2.8rem);
       margin-bottom: 15px;
-      color: #d2691e; /* warm autumn orange */
+      color: #d2691e;
     }
     .subtitle {
-      font-size: 1.4rem;
-      margin-bottom: 25px;
+      font-size: clamp(1.1rem, 3.5vw, 1.4rem);
+      margin-bottom: 20px;
       color: #555;
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(5, 60px);
-      gap: 6px;
-      margin: 30px auto;
+      grid-template-columns: repeat(9, minmax(36px, 50px));
+      gap: 5px;
+      margin: 25px auto;
       justify-content: center;
-      max-width: 350px;
+      max-width: 95vw;
     }
     .cell {
-      width: 60px;
-      height: 60px;
+      aspect-ratio: 1 / 1;
       background-color: #e0e0e0;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 2.2rem;
+      font-size: clamp(1.3rem, 4vw, 1.8rem);
       font-weight: bold;
-      border-radius: 8px;
+      border-radius: 6px;
       text-transform: uppercase;
       border: 2px solid #aaa;
     }
-    .correct { background-color: #6b8e23; color: white; border-color: #556b2f; } /* olive green for fall */
-    .present { background-color: #cd853f; color: white; border-color: #8b4513; } /* saddle brown / golden */
-    .absent { background-color: #808080; color: white; border-color: #696969; }
+    .correct  { background-color: #6b8e23; color: white; border-color: #556b2f; }
+    .present  { background-color: #cd853f; color: white; border-color: #8b4513; }
+    .absent   { background-color: #808080; color: white; border-color: #696969; }
+
     .input-row {
-      margin: 25px 0;
+      margin: 20px 0;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 6px;
     }
     .input-row input {
-      width: 50px;
-      height: 50px;
-      font-size: 1.9rem;
+      width: 42px;
+      height: 42px;
+      font-size: 1.6rem;
       text-align: center;
-      margin: 0 5px;
       text-transform: uppercase;
       border: 2px solid #bbb;
       border-radius: 6px;
     }
+
     .btn {
-      background-color: #ff4500; /* orange-red for September energy */
+      background-color: #ff4500;
       color: white;
-      padding: 14px 40px;
+      padding: 12px 36px;
       border: none;
       border-radius: 6px;
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       cursor: pointer;
       margin-top: 15px;
       transition: background 0.2s;
     }
     .btn:hover { background-color: #e03e00; }
+
     #message {
-      margin-top: 25px;
-      font-size: 1.4rem;
-      min-height: 1.5em;
+      margin-top: 20px;
+      font-size: clamp(1.2rem, 4vw, 1.4rem);
+      min-height: 1.4em;
       font-weight: bold;
+    }
+
+    @media (max-width: 500px) {
+      .grid { gap: 4px; }
+      .cell { font-size: clamp(1rem, 3.5vw, 1.4rem); }
+      .input-row input { width: 38px; height: 38px; font-size: 1.4rem; }
     }
   </style>
 </head>
 <body>
-  <h1>September Wordle</h1>
-  <p class="subtitle">Back-to-school vibes • Early fall • Guess the 5-letter word!</p>
+
+  <h1>Asheeqah hard Wordle</h1>
+  <p class="subtitle">Guess the 9-letter word</p>
+
   <div class="grid" id="grid"></div>
-  <div class="input-row">
-    <input type="text" maxlength="1" id="g1" autofocus>
-    <input type="text" maxlength="1" id="g2">
-    <input type="text" maxlength="1" id="g3">
-    <input type="text" maxlength="1" id="g4">
-    <input type="text" maxlength="1" id="g5">
-  </div>
+
+  <div class="input-row" id="inputRow"></div>
+
   <button class="btn" id="submitGuess">Submit Guess</button>
   <div id="message"></div>
 
   <script>
-    const solution = "SEPTM";  // Short for SEPTember – fits the 5-letter format perfectly
+    const solution = "SEPTEMBER";
 
     const grid = document.getElementById("grid");
     const messageDiv = document.getElementById("message");
+    const inputRow = document.getElementById("inputRow");
+
     let row = 0;
     let attempts = 0;
     const maxAttempts = 6;
+    const WORD_LENGTH = solution.length; // 9
 
-    // Create empty 6×5 grid at start
-    for (let i = 0; i < maxAttempts * 5; i++) {
+    // Create 6 rows × 9 columns empty grid
+    for (let i = 0; i < maxAttempts * WORD_LENGTH; i++) {
       const cell = document.createElement("div");
       cell.classList.add("cell");
       grid.appendChild(cell);
     }
 
-    const inputs = [
-      document.getElementById("g1"),
-      document.getElementById("g2"),
-      document.getElementById("g3"),
-      document.getElementById("g4"),
-      document.getElementById("g5")
-    ];
-
-    // Auto-focus next input + uppercase + backspace navigation
-    inputs.forEach((input, i) => {
+    // Create 9 input fields dynamically
+    const inputs = [];
+    for (let i = 0; i < WORD_LENGTH; i++) {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.maxLength = 1;
+      input.autofocus = i === 0;
+      input.id = `g${i+1}`;
       input.addEventListener("input", () => {
         input.value = input.value.toUpperCase();
-        if (input.value && i < 4) inputs[i + 1].focus();
+        if (input.value && i < WORD_LENGTH - 1) {
+          inputs[i + 1].focus();
+        }
       });
       input.addEventListener("keydown", e => {
         if (e.key === "Backspace" && !input.value && i > 0) {
           inputs[i - 1].focus();
         }
       });
-    });
+      inputRow.appendChild(input);
+      inputs.push(input);
+    }
 
     document.getElementById("submitGuess").addEventListener("click", () => {
       const guess = inputs.map(el => el.value).join("").trim();
 
-      if (guess.length !== 5) {
-        messageDiv.textContent = "Enter a 5-letter word!";
+      if (guess.length !== WORD_LENGTH) {
+        messageDiv.textContent = `Please enter exactly ${WORD_LENGTH} letters!`;
         return;
       }
 
       attempts++;
       messageDiv.textContent = "";
 
-      // Feedback logic (handles duplicate letters correctly)
-      let feedback = Array(5).fill("absent");
+      // Feedback logic (handles duplicates correctly)
+      let feedback = Array(WORD_LENGTH).fill("absent");
       let solutionCount = {};
 
       for (let char of solution) {
         solutionCount[char] = (solutionCount[char] || 0) + 1;
       }
 
-      // Mark correct positions (green) first
-      for (let i = 0; i < 5; i++) {
+      // Correct positions first
+      for (let i = 0; i < WORD_LENGTH; i++) {
         if (guess[i] === solution[i]) {
           feedback[i] = "correct";
           solutionCount[guess[i]]--;
         }
       }
 
-      // Mark present letters (yellow)
-      for (let i = 0; i < 5; i++) {
+      // Present letters
+      for (let i = 0; i < WORD_LENGTH; i++) {
         if (feedback[i] === "absent" && solution.includes(guess[i]) && solutionCount[guess[i]] > 0) {
           feedback[i] = "present";
           solutionCount[guess[i]]--;
         }
       }
 
-      // Update current row in grid
+      // Update current row
       const cells = grid.children;
-      const start = row * 5;
-      for (let i = 0; i < 5; i++) {
+      const start = row * WORD_LENGTH;
+      for (let i = 0; i < WORD_LENGTH; i++) {
         const cell = cells[start + i];
-        cell.textContent = guess[i] || "";  // safety in case somehow empty
+        cell.textContent = guess[i];
         cell.classList.add(feedback[i]);
       }
 
@@ -187,7 +201,7 @@
         return;
       }
 
-      // Move to next row & clear inputs
+      // Next row + clear inputs
       row++;
       inputs.forEach(el => el.value = "");
       inputs[0].focus();
