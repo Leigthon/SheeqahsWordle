@@ -12,9 +12,9 @@
       padding: 5vw;
       color: #333;
     }
-    h1 { 
-      font-size: 2.8rem; 
-      margin-bottom: 15px; 
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 15px;
       color: #d2691e; /* warm autumn orange */
     }
     .subtitle {
@@ -43,9 +43,9 @@
       text-transform: uppercase;
       border: 2px solid #aaa;
     }
-    .correct  { background-color: #6b8e23; color: white; border-color: #556b2f; } /* olive green for fall */
-    .present  { background-color: #cd853f; color: white; border-color: #8b4513; } /* saddle brown / golden */
-    .absent   { background-color: #808080; color: white; border-color: #696969; }
+    .correct { background-color: #6b8e23; color: white; border-color: #556b2f; } /* olive green for fall */
+    .present { background-color: #cd853f; color: white; border-color: #8b4513; } /* saddle brown / golden */
+    .absent { background-color: #808080; color: white; border-color: #696969; }
     .input-row {
       margin: 25px 0;
     }
@@ -71,21 +71,18 @@
       transition: background 0.2s;
     }
     .btn:hover { background-color: #e03e00; }
-    #message { 
-      margin-top: 25px; 
-      font-size: 1.4rem; 
-      min-height: 1.5em; 
+    #message {
+      margin-top: 25px;
+      font-size: 1.4rem;
+      min-height: 1.5em;
       font-weight: bold;
     }
   </style>
 </head>
 <body>
-
   <h1>September Wordle</h1>
   <p class="subtitle">Back-to-school vibes • Early fall • Guess the 5-letter word!</p>
-
   <div class="grid" id="grid"></div>
-
   <div class="input-row">
     <input type="text" maxlength="1" id="g1" autofocus>
     <input type="text" maxlength="1" id="g2">
@@ -93,21 +90,19 @@
     <input type="text" maxlength="1" id="g4">
     <input type="text" maxlength="1" id="g5">
   </div>
-
   <button class="btn" id="submitGuess">Submit Guess</button>
   <div id="message"></div>
 
   <script>
-    const solution   = "SCHOOL";          // ← September theme (back to school!)
-    // Alternatives: "APPLE", "ACORN", "CIDER", "EQUIN", "MAIZE", "FALLS"
+    const solution = "SEPTM";  // Short for SEPTember – fits the 5-letter format perfectly
 
-    const grid       = document.getElementById("grid");
+    const grid = document.getElementById("grid");
     const messageDiv = document.getElementById("message");
     let row = 0;
     let attempts = 0;
     const maxAttempts = 6;
 
-    // Create empty 6×5 grid
+    // Create empty 6×5 grid at start
     for (let i = 0; i < maxAttempts * 5; i++) {
       const cell = document.createElement("div");
       cell.classList.add("cell");
@@ -122,15 +117,15 @@
       document.getElementById("g5")
     ];
 
-    // Auto-focus next + uppercase + backspace jump
+    // Auto-focus next input + uppercase + backspace navigation
     inputs.forEach((input, i) => {
       input.addEventListener("input", () => {
         input.value = input.value.toUpperCase();
-        if (input.value && i < 4) inputs[i+1].focus();
+        if (input.value && i < 4) inputs[i + 1].focus();
       });
       input.addEventListener("keydown", e => {
         if (e.key === "Backspace" && !input.value && i > 0) {
-          inputs[i-1].focus();
+          inputs[i - 1].focus();
         }
       });
     });
@@ -146,7 +141,7 @@
       attempts++;
       messageDiv.textContent = "";
 
-      // Feedback logic (handles duplicates properly)
+      // Feedback logic (handles duplicate letters correctly)
       let feedback = Array(5).fill("absent");
       let solutionCount = {};
 
@@ -154,7 +149,7 @@
         solutionCount[char] = (solutionCount[char] || 0) + 1;
       }
 
-      // Correct positions first
+      // Mark correct positions (green) first
       for (let i = 0; i < 5; i++) {
         if (guess[i] === solution[i]) {
           feedback[i] = "correct";
@@ -162,7 +157,7 @@
         }
       }
 
-      // Present (yellow) letters
+      // Mark present letters (yellow)
       for (let i = 0; i < 5; i++) {
         if (feedback[i] === "absent" && solution.includes(guess[i]) && solutionCount[guess[i]] > 0) {
           feedback[i] = "present";
@@ -170,19 +165,19 @@
         }
       }
 
-      // Update row
+      // Update current row in grid
       const cells = grid.children;
       const start = row * 5;
       for (let i = 0; i < 5; i++) {
         const cell = cells[start + i];
-        cell.textContent = guess[i];
+        cell.textContent = guess[i] || "";  // safety in case somehow empty
         cell.classList.add(feedback[i]);
       }
 
       if (guess === solution) {
-        messageDiv.textContent = "You got it! youre too smart for me i swear!!";
+        messageDiv.textContent = "You got it! You're too smart for me i swear!! 🎉";
         setTimeout(() => {
-          window.location.href = "https://youtu.be/uJViyj5z6aY?si=7t35eXgaBpdUDFxO"; // example: upbeat September song/video
+          window.location.href = "https://youtu.be/uJViyj5z6aY?si=7t35eXgaBpdUDFxO";
         }, 1800);
         return;
       }
@@ -192,7 +187,7 @@
         return;
       }
 
-      // Next row + reset inputs
+      // Move to next row & clear inputs
       row++;
       inputs.forEach(el => el.value = "");
       inputs[0].focus();
