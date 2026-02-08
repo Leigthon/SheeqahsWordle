@@ -1,187 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Wordle Game - iLuvU</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        background-color: #f4f4f4;
-        padding: 5vw;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wordle Game - iLuvU</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f4;
+      padding: 5vw;
+    }
+    h1 { font-size: 2.5rem; margin-bottom: 20px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 60px);
+      gap: 5px;
+      margin: 30px auto;
+      justify-content: center;
+    }
+    .cell {
+      width: 60px;
+      height: 60px;
+      background-color: #ddd;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      font-weight: bold;
+      border-radius: 5px;
+      text-transform: uppercase;
+    }
+    .correct  { background-color: #538d4e; color: white; }
+    .present  { background-color: #b59f3b; color: white; }
+    .absent   { background-color: #3a3c3c; color: white; }
+    .input-row {
+      margin: 20px 0;
+    }
+    .input-row input {
+      width: 50px;
+      height: 50px;
+      font-size: 1.8rem;
+      text-align: center;
+      margin: 0 4px;
+      text-transform: uppercase;
+    }
+    .btn {
+      background-color: #4caf50;
+      color: white;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 4px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    #message { margin-top: 20px; font-size: 1.3rem; min-height: 1.4em; }
+  </style>
+</head>
+<body>
 
-      h1 {
-        font-size: 2.5rem;
-        margin-bottom: 20px;
-      }
+  <h1>Wordle - Guess the word!</h1>
 
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(5, 15vw); /* Responsive column sizes */
-        gap: 5px;
-        margin-bottom: 20px;
-        justify-content: center;
-      }
+  <div class="grid" id="grid"></div>
 
-      .cell {
-        width: 100%;
-        height: 15vw;
-        max-width: 60px;
-        max-height: 60px;
-        background-color: #ddd;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 4vw;
-        font-weight: bold;
-        border-radius: 5px;
-      }
+  <div class="input-row">
+    <input type="text" maxlength="1" id="g1" autofocus>
+    <input type="text" maxlength="1" id="g2">
+    <input type="text" maxlength="1" id="g3">
+    <input type="text" maxlength="1" id="g4">
+    <input type="text" maxlength="1" id="g5">
+  </div>
 
-      .correct {
-        background-color: green;
-        color: white;
-      }
+  <button class="btn" id="submitGuess">Submit Guess</button>
+  <div id="message"></div>
 
-      .present {
-        background-color: yellow;
-        color: white;
-      }
+  <script>
+    const solution   = "MARRY";           // ← 5 letters, uppercase
+    const grid       = document.getElementById("grid");
+    const messageDiv = document.getElementById("message");
+    let row = 0;
+    let attempts = 0;
+    const maxAttempts = 6;
 
-      .absent {
-        background-color: grey;
-        color: white;
-      }
+    // Create 6×5 empty grid at start
+    for (let i = 0; i < maxAttempts * 5; i++) {
+      const cell = document.createElement("div");
+      cell.classList.add("cell");
+      grid.appendChild(cell);
+    }
 
-      .input-row input {
-        width: 10vw;
-        height: 10vw;
-        font-size: 4vw;
-        text-align: center;
-        margin: 2vw;
-        max-width: 50px;
-        max-height: 50px;
-      }
+    const inputs = [
+      document.getElementById("g1"),
+      document.getElementById("g2"),
+      document.getElementById("g3"),
+      document.getElementById("g4"),
+      document.getElementById("g5")
+    ];
 
-      .btn {
-        background-color: #4caf50;
-        color: white;
-        padding: 2vw 4vw;
-        border: none;
-        cursor: pointer;
-        font-size: 4vw;
-        margin-top: 5vw;
-      }
-
-      .btn:active {
-        background-color: #45a049;
-      }
-
-      @media (max-width: 480px) {
-        h1 {
-          font-size: 2rem;
-        }
-
-        .btn {
-          padding: 2vw 3vw;
-        }
-
-        .grid {
-          grid-template-columns: repeat(5, 1fr);
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Wordle - Guess the word!</h1>
-    <div class="grid">
-      <div class="cell"></div>
-      <div class="cell"></div>
-      <div class="cell"></div>
-      <div class="cell"></div>
-      <div class="cell"></div>
-      <div class="cell"></div>
-      <div class="cell"></div>
-      <div class="cell"></div>
-    </div>
-
-    <div class="input-row">
-      <input type="text" id="guess1" maxlength="1" />
-      <input type="text" id="guess2" maxlength="1" />
-      <input type="text" id="guess3" maxlength="1" />
-      <input type="text" id="guess4" maxlength="1" />
-      <input type="text" id="guess5" maxlength="1" />
-      <input type="text"id="guess6" maxlength="1" />
-      <input type="text" id="guess7" maxlength="1" />
-      <input type="text" id="guess8" maxlength="1" />
-    </div>
-
-    <button class="btn" id="submitGuess">Submit Guess</button>
-
-    <div id="message"></div>
-
-    <script>
-      const solution = "marryyou"; // The solution to the puzzle
-      const submitButton = document.getElementById("submitGuess");
-      const messageDiv = document.getElementById("message");
-      let attempts = 0;
-
-      submitButton.addEventListener("click", () => {
-        const guess = [
-          document.getElementById("guess1").value,
-          document.getElementById("guess2").value,
-          document.getElementById("guess3").value,
-          document.getElementById("guess4").value,
-          document.getElementById("guess5").value,
-          document.getElementById("guess6").value,
-          document.getElementById("guess7").value,
-          document.getElementById("guess8").value,
-        ].join("");
-
-        if (guess.length !== 8) {
-          messageDiv.textContent = "Please enter exactly 5 letters.";
-          return;
-        }
-
-        attempts++;
-        let feedback = [];
-
-        for (let i = 0; i < 8; i++) {
-          if (guess[i] === solution[i]) {
-            feedback.push("correct");
-          } else if (solution.includes(guess[i])) {
-            feedback.push("present");
-          } else {
-            feedback.push("absent");
-          }
-        }
-
-        updateGrid(feedback, guess);
-
-        if (guess === solution) {
-          messageDiv.textContent = "Congratulations! You guessed the word! I love you Asheeqah Adonis";
-
-
-  setTimeout(() => {
-            window.location.href = "https://youtu.be/4urQzMh5gZw?si=pRbwj_mvvWBKD87-"; // Replace with actual video URL
-          }, 2000); // 2-second delay
-        } else if (attempts === 6) {
-          messageDiv.textContent = `Game over! The word was "${solution}".`;
+    // Auto-focus next input + uppercase
+    inputs.forEach((input, i) => {
+      input.addEventListener("input", () => {
+        input.value = input.value.toUpperCase();
+        if (input.value && i < 4) inputs[i+1].focus();
+      });
+      input.addEventListener("keydown", e => {
+        if (e.key === "Backspace" && !input.value && i > 0) {
+          inputs[i-1].focus();
         }
       });
+    });
 
-      function updateGrid(feedback, guess) {
-        const grid = document.querySelector(".grid");
-        grid.innerHTML = ""; // Clear the grid before updating
+    document.getElementById("submitGuess").addEventListener("click", () => {
+      const guess = inputs.map(el => el.value).join("").trim();
 
-        for (let i = 0; i < 5; i++) {
-          const cell = document.createElement("div");
-          cell.classList.add("cell", feedback[i]);
-          cell.textContent = guess[i].toUpperCase();
-          grid.appendChild(cell);
+      if (guess.length !== 5) {
+        messageDiv.textContent = "Please enter 5 letters.";
+        return;
+      }
+
+      attempts++;
+      messageDiv.textContent = "";
+
+      // Simple feedback (not perfect duplicate handling)
+      let feedback = Array(5).fill("absent");
+      let solutionCount = {};
+
+      // Count letters in solution
+      for (let char of solution) {
+        solutionCount[char] = (solutionCount[char] || 0) + 1;
+      }
+
+      // First pass: correct positions
+      for (let i = 0; i < 5; i++) {
+        if (guess[i] === solution[i]) {
+          feedback[i] = "correct";
+          solutionCount[guess[i]]--;
         }
       }
-    </script>
-  </body>
+
+      // Second pass: present letters
+      for (let i = 0; i < 5; i++) {
+        if (feedback[i] === "absent" && solution.includes(guess[i]) && solutionCount[guess[i]] > 0) {
+          feedback[i] = "present";
+          solutionCount[guess[i]]--;
+        }
+      }
+
+      // Update current row
+      const cells = grid.children;
+      const start = row * 5;
+      for (let i = 0; i < 5; i++) {
+        const cell = cells[start + i];
+        cell.textContent = guess[i];
+        cell.classList.add(feedback[i]);
+      }
+
+      if (guess === solution) {
+        messageDiv.textContent = "Congratulations! I love you Asheeqah Adonis ❤️";
+        setTimeout(() => {
+          window.location.href = "https://youtu.be/4urQzMh5gZw?si=pRbwj_mvvWBKD87-";
+        }, 1800);
+        return;
+      }
+
+      if (attempts >= maxAttempts) {
+        messageDiv.textContent = `Game over! The word was ${solution}`;
+        return;
+      }
+
+      // Move to next row + clear inputs
+      row++;
+      inputs.forEach(el => el.value = "");
+      inputs[0].focus();
+    });
+  </script>
+</body>
 </html>
